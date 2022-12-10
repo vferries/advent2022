@@ -44,7 +44,23 @@ Gen 6 : 516
     }
 
     private fun vault(): String {
-        TODO()
+        val input = "TACGATGCATGGCTACYZZWXVAVYZTTAGACTAGCACTCGA"
+        val matchings = mapOf(
+            'V' to "55",
+            'W' to "4E",
+            'X' to "46",
+            'Y' to "52",
+            'Z' to "45"
+        ).mapValues { (_, v) -> Char(v.toInt(16)) }.toMutableMap()
+        matchings['A'] = 'T'
+        matchings['T'] = 'A'
+        matchings['C'] = 'G'
+        matchings['G'] = 'C'
+        return input
+            .map { matchings.getOrElse(it) { it } }
+            .joinToString("")
+            .drop(15)
+            .dropLast(16)
     }
 
     private fun tunnel(): String = "ROOTSOFLIFE" // Extracted from JavaScript for part 1
