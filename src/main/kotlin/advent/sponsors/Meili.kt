@@ -1,5 +1,7 @@
 package advent.sponsors
 
+import java.util.*
+
 object Meili {
     fun part1(lines: List<String>): String {
         val rootNode = constructTree(lines)
@@ -16,22 +18,28 @@ object Meili {
         var currentNode = rootNode
         var totalSteps = 0
         while (rootNode.allNodes().any { it.children.isNotEmpty() }) {
-            val toVisit = mutableListOf(currentNode to 0)
+            val toVisit =
+                PriorityQueue(compareBy<Pair<PathNode, Int>> { it.second }.then(compareBy { it.first.path }))
+            toVisit.add(currentNode to 0)
+            val visited = mutableSetOf<PathNode>()
             while (toVisit.isNotEmpty()) {
-                val (node, steps) = toVisit.removeAt(0)
+                val (node, steps) = toVisit.remove()
+                if (visited.contains(node)) {
+                    continue
+                }
+                visited.add(node)
                 if (node.children.isNotEmpty()) {
                     totalSteps += steps
+                    println("Delivered presents to ${node.children} in $totalSteps steps")
                     node.children.clear()
-                    if (node.leftNode == null && node.rightNode == null) {
-                        //TODO supprimer noeud et potentiellement ses parents
-                    }
                     currentNode = node
                     break
+                } else {
+                    toVisit.addAll(node.directNeighbors(steps))
                 }
-                //sinon on empile dans la liste ses voisins (devant ou derrière fonction des cas)
             }
         }
-        return 0
+        return totalSteps
     }
 
     private fun constructTree(lines: List<String>): PathNode {
@@ -72,7 +80,13 @@ object Meili {
     }
 }
 
-data class PathNode(val path: String, val parent: PathNode?, var leftNode: PathNode? = null, var rightNode: PathNode? = null, val children: MutableList<String> = mutableListOf()) {
+data class PathNode(
+    val path: String,
+    val parent: PathNode?,
+    var leftNode: PathNode? = null,
+    var rightNode: PathNode? = null,
+    val children: MutableList<String> = mutableListOf()
+) {
     fun allNodesWithStops(stops: Int = 0): List<Pair<PathNode, Int>> {
         val nextStops = if (leftNode == null || rightNode == null) stops else stops + 1
         val leftNodes = leftNode?.allNodesWithStops(nextStops) ?: listOf()
@@ -81,12 +95,33 @@ data class PathNode(val path: String, val parent: PathNode?, var leftNode: PathN
     }
 
     override fun toString(): String {
-        return "Node $children"
+        return "Node $path"
     }
 
     fun allNodes(): List<PathNode> {
         val leftNodes = leftNode?.allNodes() ?: listOf()
         val rightNodes = rightNode?.allNodes() ?: listOf()
         return leftNodes + rightNodes + this
+    }
+
+    fun directNeighbors(steps: Int): List<Pair<PathNode, Int>> {
+        val neighbors = mutableListOf<Pair<PathNode, Int>>()
+        if (this.parent != null) {
+            neighbors.add(this.parent to steps + 1)
+        }
+        val delta = if (leftNode == null || rightNode == null) 1 else 0
+        val leftNode = this.leftNode
+        if (leftNode != null) {
+            neighbors.add(leftNode to steps + delta)
+        }
+        val rightNode = this.rightNode
+        if (rightNode != null) {
+            neighbors.add(rightNode to steps + delta)
+        }
+        return neighbors
+    }
+
+    override fun hashCode(): Int {
+        return path.hashCode()
     }
 }
