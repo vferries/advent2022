@@ -109,7 +109,7 @@ data class PathNode(
         if (this.parent != null) {
             neighbors.add(this.parent to steps + 1)
         }
-        val delta = if (leftNode == null || rightNode == null) 1 else 0
+        val delta = if (leftNode == null || rightNode == null) 0 else 1
         val leftNode = this.leftNode
         if (leftNode != null) {
             neighbors.add(leftNode to steps + delta)
