@@ -29,7 +29,7 @@ class Day15Test {
 
         @Test
         fun `Should find beacon tuning frequency for input`() {
-            assertEquals(0, Day15.part2(readLines("day15.txt"), 4_000_000))
+            assertEquals(13_071_206_703_981, Day15.part2(readLines("day15.txt"), 4_000_000))
         }
     }
 }

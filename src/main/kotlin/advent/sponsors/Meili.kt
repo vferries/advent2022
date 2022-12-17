@@ -107,7 +107,8 @@ data class PathNode(
     fun directNeighbors(steps: Int): List<Pair<PathNode, Int>> {
         val neighbors = mutableListOf<Pair<PathNode, Int>>()
         if (this.parent != null) {
-            neighbors.add(this.parent to steps + 1)
+            val delta = if (this.parent.leftNode == null || this.parent.rightNode == null) 0 else 1
+            neighbors.add(this.parent to steps + delta)
         }
         val delta = if (leftNode == null || rightNode == null) 0 else 1
         val leftNode = this.leftNode

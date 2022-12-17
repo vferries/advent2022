@@ -1,6 +1,10 @@
 package advent
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.math.abs
+import kotlin.math.max
 
 object Day15 {
     fun part1(lines: List<String>, y: Int): Int {
@@ -18,18 +22,32 @@ object Day15 {
         return count
     }
 
-    fun part2(lines: List<String>, maxValue: Int): Int {
+    fun part2(lines: List<String>, maxValue: Int): Long {
         val beacons = parseBeacons(lines)
         val beaconsPos = beacons.map(Beacon::beaconPos).toSet()
-        for (x in 0..maxValue) {
-            for (y in 0..maxValue) {
-                val currentPos = Pos(x, y)
-                if (!beaconsPos.contains(currentPos) && !beacons.any { currentPos.manhattan(it.sensorPos) <= it.distance }) {
-                    return currentPos.x * 4_000_000 + currentPos.y
+        val result = runBlocking {
+            (0..maxValue).chunked(100000).map { ys ->
+                val res = ys.map { y ->
+                    async {
+                        var x = 0
+                        while (x <= maxValue) {
+                            val currentPos = Pos(x, y)
+                            val maxDiff = beacons.maxOf { it.distance - currentPos.manhattan(it.sensorPos) }
+                            if (maxDiff >= 0) {
+                                x += max(maxDiff, 0) + 1
+                            } else if (!beaconsPos.contains(currentPos)) {
+                                return@async currentPos.x * 4_000_000.toLong() + currentPos.y
+                            }
+                        }
+                        return@async null
+                    }
+                }.firstNotNullOfOrNull { it.await() }
+                if (res != null) {
+                    return@runBlocking res
                 }
             }
         }
-        throw UnsupportedOperationException("Unable to find beacon position")
+        return result as Long
     }
 
     private fun parseBeacons(lines: List<String>): List<Beacon> {
