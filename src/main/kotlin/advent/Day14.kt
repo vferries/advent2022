@@ -75,4 +75,4 @@ object Day14 {
     }
 }
 
-private operator fun Pos.plus(other: Pos): Pos = Pos(this.x + other.x, this.y + other.y)
+operator fun Pos.plus(other: Pos): Pos = Pos(this.x + other.x, this.y + other.y)
