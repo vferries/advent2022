@@ -34,7 +34,6 @@ object Day17 {
     fun part1(jetPattern: String, rocksFallen: Int): Int {
         var currentStep = 0
         var tower = mutableSetOf<Pos>()
-        var removedHeight = 0
         repeat(rocksFallen) { iteration ->
             val rockPositions = rocks[iteration % rocks.size]
             var bottomLeft = Pos(2, (tower.maxOfOrNull { it.y } ?: 0) + 4)
@@ -61,26 +60,8 @@ object Day17 {
 
             // Insert rockPositions to tower
             tower += rockPositions.map { it + bottomLeft }
-            var minHeight = 0
-            for (y in tower.maxOf{it.y} downTo tower.minOf{it.y}) {
-                if ((0..6).all { tower.contains(Pos(it, y)) }) {
-                    minHeight = y
-                    break
-                }
-            }
-            if (minHeight > 0) {
-                println(minHeight)
-                removedHeight += minHeight
-                tower = tower
-                    .filter { it.y > minHeight }
-                    .map { Pos(it.x, it.y - minHeight) }
-                    .toMutableSet()
-            }
         }
-        for (y in tower.maxOf{it.y} downTo 0) {
-            println((0..6).map {if (tower.contains(Pos(it, y))) '#' else '.'}.joinToString(""))
-        }
-        return removedHeight + tower.maxOf { it.y }
+        return tower.maxOf { it.y }
     }
 
     fun part2(jetPattern: String, rocksFallen: BigInteger): BigInteger {
