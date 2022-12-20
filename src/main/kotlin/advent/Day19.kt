@@ -4,13 +4,13 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 object Day19 {
-    //TODO Optimize (20 minutes)
     fun part1(lines: List<String>): Int {
         val bluePrints = lines.mapIndexed { index, line -> parseBluePrint(index, line) }
         return bluePrints.sumOf { bluePrint -> bluePrint.id * bestScore(bluePrint, 24) }
     }
 
     fun part2(lines: List<String>): Int {
+        //TODO Optimize (20 minutes)
         val bluePrints = lines.mapIndexed { index, line -> parseBluePrint(index, line) }
         return bluePrints.take(3).map { bluePrint -> bestScore(bluePrint, 32) }.reduce(Int::times)
     }
@@ -32,8 +32,9 @@ object Day19 {
             return memo.getValue(current)
         }
         if (timeRemaining <= 0) return 0
-        // TODO Do not build a robot if max(res) reached
         val robotScores = bluePrint.robots
+            .asSequence()
+            .filter { robot -> robot.type != 0 || bluePrint.maxOre >= robots.first }
             .filter { robot ->
                 (robot.creationCost.first == 0 || robots.first > 0)
                         && (robot.creationCost.second == 0 || robots.second > 0)
@@ -61,6 +62,7 @@ object Day19 {
                     )
                 }
             }
+            .toList()
         val bestScore = robotScores.maxOrNull() ?: 0
         memo[current] = bestScore
         return bestScore
@@ -122,4 +124,8 @@ data class Robot(val type: Int, val creationCost: Resources) {
     }
 }
 
-data class BluePrint(val id: Int, val robots: List<Robot>)
+data class BluePrint(val id: Int, val robots: List<Robot>){
+    val maxOre: Int = robots.maxOf { it.creationCost.first }
+    val maxClay: Int = robots.maxOf { it.creationCost.second }
+    val maxObsidian: Int = robots.maxOf { it.creationCost.third }
+}

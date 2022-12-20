@@ -44,7 +44,7 @@ class Day19Test {
 
         @Test
         fun `Should find max geodes for input`() {
-            assertEquals(0, Day19.part2(readLines("day19.txt")))
+            assertEquals(4257, Day19.part2(readLines("day19.txt")))
         }
 
         @Test
