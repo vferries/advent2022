@@ -13,7 +13,6 @@ object Day20 {
         val nums = constructNums(numbers)
         repeat(10) {
             mix(nums)
-            display(nums[0])
         }
         return sumFirstThreeThousands(numbers, nums)
     }
@@ -46,21 +45,17 @@ object Day20 {
         return nums
     }
 
-    private fun display(first: Num) {
-        var current = first
-        val list = mutableListOf<Long>()
-        do {
-            list.add(current.n)
-            current = current.next
-        } while (current != first)
-        println(list)
-    }
-
     private fun mix(nums: List<Num>) {
         var current: Num? = nums[0]
         while (current != null) {
             val c = current!!
-            val n = (current.n % (nums.size - 1)).toInt()
+            var n = (current.n % (nums.size - 1)).toInt()
+            if (n > nums.size / 2) {
+                n -= nums.size - 1
+            }
+            if (-n > nums.size / 2) {
+                n += nums.size - 1
+            }
             var destination = c
             if (n != 0) {
                 if (n > 0) {
@@ -91,8 +86,4 @@ data class Num(val n: Long) {
     var initialNext: Num? = null
     lateinit var previous: Num
     lateinit var next: Num
-
-    override fun toString(): String {
-        return "Num $n (p=${previous.n}, n=${next.n})"
-    }
 }
