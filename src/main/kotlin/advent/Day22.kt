@@ -44,6 +44,24 @@ object Day22 {
             // Grey
             mappings[Pos(50 + i, 0) to UP] = Pos(0, 150 + i) to RIGHT
             mappings[Pos(0, 150 + i) to LEFT] = Pos(50 + i, 0) to DOWN
+            // Orange
+            mappings[Pos(100 + i, 0) to UP] = Pos(i, 199) to UP
+            mappings[Pos(i, 199) to DOWN] = Pos(100 + i, 0) to DOWN
+            // Violet
+            mappings[Pos(50, i) to LEFT] = Pos(0, 149 - i) to RIGHT
+            mappings[Pos(0, 149 - i) to LEFT] = Pos(50, i) to RIGHT
+            // Green
+            mappings[Pos(149, i) to RIGHT] = Pos(99, 149 - i) to LEFT
+            mappings[Pos(99, 149 - i) to RIGHT] = Pos(149, i) to LEFT
+            // Red
+            mappings[Pos(50, 50 + i) to LEFT] = Pos(i, 100) to DOWN
+            mappings[Pos(i, 100) to UP] = Pos(50, 50 + i) to RIGHT
+            // Blue
+            mappings[Pos(99, 50 + i) to RIGHT] = Pos(100 + i, 49) to UP
+            mappings[Pos(100 + i, 49) to DOWN] = Pos(99, 50 + i) to LEFT
+            // Yellow
+            mappings[Pos(49, 150 + i) to RIGHT] = Pos(50 + i, 149) to UP
+            mappings[Pos(50 + i, 149) to DOWN] = Pos(49, 150 + i) to LEFT
         }
 
         var currentPos = startingPos
@@ -51,14 +69,21 @@ object Day22 {
         for (instruction in instructions) {
             if (instruction[0].isDigit()) {
                 for (i in 0 until instruction.toInt()) {
-                    var nextPos = currentPos + currentDir.offset
-                    if (!board.containsKey(nextPos)) {
-                        nextPos = wrapAround(currentDir, board, currentPos)
-                    }
-                    if (board.getValue(nextPos) == '#') {
-                        break
+                    if (mappings.containsKey(currentPos to currentDir)) {
+                        val (nextPos, nextDir) = mappings.getValue(currentPos to currentDir)
+                        if (board.getValue(nextPos) == '#') {
+                            break
+                        } else {
+                            currentPos = nextPos
+                            currentDir = nextDir
+                        }
                     } else {
-                        currentPos = nextPos
+                        val nextPos = currentPos + currentDir.offset
+                        if (board.getValue(nextPos) == '#') {
+                            break
+                        } else {
+                            currentPos = nextPos
+                        }
                     }
                 }
             } else {

@@ -31,7 +31,7 @@ class Day22Test {
 
         @Test
         fun `Should find correct ending position for input`() {
-            assertEquals(0, Day22.part2(readLines("day22.txt")))
+            assertEquals(95316, Day22.part2(readLines("day22.txt")))
         }
     }
 }
